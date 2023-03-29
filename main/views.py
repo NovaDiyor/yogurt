@@ -63,12 +63,10 @@ def logout_view(request):
     try:
         if request.method == 'DELETE':
             user = request.user
-            Token.objects.get(user=user).delete()
-            logout(request)
+            logout(request, user)
             return Response('You logged out')
     except Exception as err:
         return Response(f'error: {err}')
-
 
 
 @api_view(['POST'])
@@ -80,9 +78,8 @@ def create_product(request):
             price = request.POST.get('price')
             count = request.POST.get('count')
             message = request.POST.get('message')
-            lp = [label, value, message, str(price), str(count)]
             product = Product.objects.create(label=label, value=value, price=price, count=count, message=message)
-            return Response(lp)
+            return Response(ProductOne(product).data)
         else:
             return Response('wrong method', status.HTTP_405_METHOD_NOT_ALLOWED)
     except Exception as err:
@@ -142,7 +139,6 @@ def update_product(request, pk):
 
 
 @api_view(['DELETE'])
-   
 def delete_product(request, pk):
     try:
         if request.method == 'DELETE':
@@ -156,7 +152,6 @@ def delete_product(request, pk):
 
 
 @api_view(['POST'])
-   
 def create_owner(request):
     try:
         if request.method == 'POST':
@@ -186,6 +181,7 @@ def get_owner(request):
                 for i in owner:
                     product = Product.objects.get(id=i.category_id)
                     data = {
+                        'id': i.id,
                         'name': i.name,
                         'product': ProductOne(product).data,
                         'count': i.count,
@@ -264,11 +260,12 @@ def get_given(request):
     try:
         if request.method == 'GET':
             given = Owner.objects.filter(given=True)
-            lg = []
+            tr = []
             if given.count() > 0:
                 for i in given:
                     product = Product.objects.get(id=i.category_id)
                     data = {
+                        'id': i.id,
                         'name': i.name,
                         'product': ProductOne(product).data,
                         'count': i.count,
@@ -277,8 +274,8 @@ def get_given(request):
                         'message': i.message,
                         'date': i.date
                     }
-                    lg.append(data)
-            return Response(lg)
+                    tr.append(data)
+            return Response(tr)
         else:
             return Response('wrong method', status.HTTP_405_METHOD_NOT_ALLOWED)
     except Exception as err:
@@ -286,7 +283,6 @@ def get_given(request):
 
 
 @api_view(['POST'])
-   
 def create_user(request):
     try:
         if request.method == 'POST':
@@ -294,12 +290,10 @@ def create_user(request):
             password = request.POST.get('password')
             user = User.objects.create_user(username=username, password=password, security=password, is_staff=True,
                                             is_superuser=True)
-            token = Token.objects.create(user=user)
             data = {
                 "name": username,
                 "password": password,
                 "id": user.id,
-                "token": token.key
             }
             return Response(data)
         return Response('wrong method')
@@ -308,7 +302,6 @@ def create_user(request):
 
 
 @api_view(['GET'])
-   
 def get_user(request):
     try:
         if request.method == 'GET':
@@ -320,7 +313,6 @@ def get_user(request):
 
 
 @api_view(['GET'])
-   
 def get_single_user(request, pk):
     try:
         if request.method == 'GET':
@@ -335,7 +327,6 @@ def get_single_user(request, pk):
 
 
 @api_view(['PATCH'])
-   
 def update_user(request):
     try:
         if request.method == 'PATCH':
