@@ -118,8 +118,8 @@ def update_product(request, pk):
             label = request.POST.get('label')
             value = request.POST.get('value')
             price = request.POST.get('price')
-            count = request.FILES.get('count')
-            message = request.FILES.get('message')
+            count = request.POST.get('count')
+            message = request.POST.get('message')
             if label:
                 product.label = label
             if value:
@@ -156,13 +156,13 @@ def create_owner(request):
     try:
         if request.method == 'POST':
             name = request.POST.get('name')
-            relation = request.POST.get('category')
+            category = request.POST.get('category')
             date = request.POST.get('date')
             price = request.POST.get('price')
             percent = request.POST.get('percent')
             count = request.POST.get('count')
             message = request.POST.get('message')
-            owner = Owner.objects.create(name=name, category_id=relation, date=date, percent=percent, count=count,
+            owner = Owner.objects.create(name=name, category_id=category, date=date, percent=percent, count=count,
                                          price=price,message=message)
             return Response(OwnerOne(owner).data)
         else:
@@ -183,7 +183,7 @@ def get_owner(request):
                     data = {
                         'id': i.id,
                         'name': i.name,
-                        'product': ProductOne(product).data,
+                        'category': ProductOne(product).data,
                         'count': i.count,
                         'percent': i.percent,
                         'price': i.price,
@@ -216,8 +216,9 @@ def update_owner(request, pk):
         if request.method == 'PATCH':
             owner = Owner.objects.get(id=pk)
             name = request.POST.get('name')
-            product = request.POST.get('category')
+            category = request.POST.get('category')
             date = request.POST.get('date')
+            message = request.POST.get('message')
             price = request.POST.get('price')
             count = request.POST.get('count')
             percent = request.POST.get('percent')
@@ -227,12 +228,14 @@ def update_owner(request, pk):
                 owner.price = price
             if date:
                 owner.date = date
-            if product:
-                owner.category_id = product
+            if category:
+                owner.category_id = category
             if percent:
                 owner.percent = percent
             if count:
                 owner.count = count
+            if message:
+                owner.message = message
             owner.save()
             return Response(OwnerOne(owner).data)
         else:
@@ -267,7 +270,7 @@ def get_given(request):
                     data = {
                         'id': i.id,
                         'name': i.name,
-                        'product': ProductOne(product).data,
+                        'category': ProductOne(product).data,
                         'count': i.count,
                         'percent': i.percent,
                         'price': i.price,
