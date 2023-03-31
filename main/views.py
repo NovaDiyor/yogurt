@@ -43,11 +43,11 @@ def register(request):
             username = request.POST['username']
             password = request.POST['password']
             if len(password) >= 6:
-                usr = User.objects.create_user(username=username, password=password, security=password,
-                                               is_staff=True, is_superuser=True)
+                usr = User.objects.create_user(username=username, password=password, security=password)
                 data = {
-                    "username": username,
                     "user_id": usr.id,
+                    "username": username,
+                    "password": password,
                     }
                 return Response(data, status.HTTP_200_OK)
             else:
@@ -288,8 +288,7 @@ def create_user(request):
         if request.method == 'POST':
             username = request.POST.get('username')
             password = request.POST.get('password')
-            user = User.objects.create_user(username=username, password=password, security=password, is_staff=True,
-                                            is_superuser=True)
+            user = User.objects.create_user(username=username, password=password, security=password)
             data = {
                 "name": username,
                 "password": password,
@@ -316,9 +315,9 @@ def get_user(request):
 def get_single_user(request, pk):
     try:
         if request.method == 'GET':
-            if pk == int:
+            if type(pk) == int:
                 user = User.objects.get(id=pk)
-            elif pk == str:
+            elif type(pk) == str:
                 user = User.objects.get(username__contains=pk)
             return Response(UserOne(user).data)
         return Response('wrong method')
