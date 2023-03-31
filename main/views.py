@@ -338,7 +338,7 @@ def update_user(request):
                 user.security = password
             user.save()
             return Response(UserOne(user).data)
-        return Response('wrong method')
+        return Response('wrong method het')
     except Exception as err:
         return Response(f'error is {err}')
 
