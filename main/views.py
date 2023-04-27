@@ -59,6 +59,8 @@ def register(request):
 
 
 @api_view(['DELETE'])
+@permission_classes(BasicAuthentication)
+@authentication_classes(IsAuthenticated)
 def logout_view(request):
     try:
         if request.method == 'DELETE':
